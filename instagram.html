@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 7 Months!</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffe6ea; /* Light Pink Background */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- HEART BACKGROUND ANIMATION --- */
+        .heart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .heart-bg span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 105, 180, 0.4);
+            transform: rotate(45deg);
+            animation: float 15s linear infinite;
+        }
+
+        .heart-bg span:before,
+        .heart-bg span:after {
+            content: '';
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .heart-bg span:before { top: -50%; left: 0; }
+        .heart-bg span:after { top: 0; left: -50%; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(45deg) scale(0.8); opacity: 0; }
+            20% { opacity: 0.6; }
+            100% { transform: translateY(-20vh) rotate(45deg) scale(1.2); opacity: 0; }
+        }
+
+        /* --- INTRO SCREEN --- */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            transition: opacity 0.8s ease-out;
+            cursor: pointer;
+        }
+
+        #intro-screen h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #intro-screen h2 {
+            color: #fff0f5;
+            font-weight: 400;
+            margin: 10px 0;
+        }
+        
+        #intro-screen h3 {
+            color: white;
+            font-style: italic;
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+
+        #intro-screen p {
+            color: white;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        /* --- CHAT UI --- */
+        #chat-view {
+            width: 100%;
+            max-width: 400px;
+            display: none; /* Hidden until intro is clicked */
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #chat-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 100px;
+        }
+
+        .header {
+            width: 100%;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            color: #d6336c;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            line-height: 1.4;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: popIn 0.3s forwards;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        @keyframes popIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Paula's Messages (Left / Gray) */
+        .received {
+            align-self: flex-start;
+            background-color: #ffffff;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+
+        /* Aarav's Messages (Right / Pink) */
+        .sent {
+            align-self: flex-end;
+            background-color: #ff4081; /* Hot Pink */
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .name-label {
+            font-size: 12px;
+            color: #a67c85; /* Dusty Pink text */
+            margin-bottom: 2px;
+            margin-left: 12px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        .sent + .name-label { display: none; }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        #tap-instruction {
+            position: fixed;
+            bottom: 20px;
+            background-color: rgba(255, 64, 129, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="heart-bg" id="heart-bg"></div>
+
+    <div id="intro-screen" onclick="startChat()">
+        <h1>Happy 7 months!</h1>
+        <h2>Memory 1!</h2>
+        <h3>True Beginnings</h3>
+        <p>❤️ Tap to relive the moment ❤️</p>
+    </div>
+
+    <div id="chat-view">
+        <div class="header">
+            To: Paula ❤️
+        </div>
+
+        <div id="chat-container">
+            </div>
+
+        <div id="tap-instruction">Tap anywhere for next message</div>
+    </div>
+
+    <script>
+        // Generate random hearts for background
+        const heartContainer = document.getElementById('heart-bg');
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('span');
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.width = (Math.random() * 20 + 10) + 'px';
+            heart.style.height = heart.style.width;
+            heart.style.animationDuration = (Math.random() * 5 + 10) + 's';
+            heart.style.animationDelay = (Math.random() * 5) + 's';
+            heartContainer.appendChild(heart);
+        }
+
+        // --- CONVERSATION DATA ---
+        const conversation = [
+            { text: "It was nice meeting you!", type: "sent" },
+            { text: "hi yes so nice meeting u too", type: "received" },
+            { text: "i had so much fun today", type: "received" },
+            { text: "me too", type: "sent" },
+            { text: "I lowk came in thinking I wouldn't enjoy it", type: "sent" },
+            { text: "but i defo did", type: "sent" },
+            { text: "same same I was so scared it'd be so many weirdos but like it wasn't", type: "received" },
+            { text: "i'm rlly glad i made friends and met sm new ppl", type: "received" },
+            { text: "😭", type: "sent" },
+            { text: "weirdos", type: "sent" },
+            { text: "this is literally like the battle of the nerd", type: "received" },
+            { text: "fau lab girl takes the cake tho", type: "received" },
+            { text: "with the whole raise your hands 💔💔", type: "received" },
+            { text: "i see i see", type: "sent" },
+            { text: "mann that shit got me fucked up 😭", type: "sent" },
+            { text: "got the whole room obeying her command", type: "sent" },
+            { text: "straight aura farming", type: "received" },
+            { text: "she wants to be in an edit so bad", type: "received" },
+            { text: "wait deadass she was aura farming", type: "sent" },
+            { text: "it can't be that deep 😂", type: "sent" }
+        ];
+
+        let currentIndex = 0;
+        const chatView = document.getElementById('chat-view');
+        const introScreen = document.getElementById('intro-screen');
+        const chatContainer = document.getElementById('chat-container');
+        const tapInstruction = document.getElementById('tap-instruction');
+        let chatStarted = false;
+
+        function startChat() {
+            introScreen.style.opacity = '0';
+            setTimeout(() => {
+                introScreen.style.display = 'none';
+                chatView.style.display = 'flex';
+                chatStarted = true;
+            }, 800);
+        }
+
+        function addNextMessage() {
+            if (!chatStarted) return; // Don't add messages if still on intro screen
+
+            if (currentIndex < conversation.length) {
+                const msgData = conversation[currentIndex];
+                
+                const bubble = document.createElement('div');
+                bubble.classList.add('message');
+                bubble.classList.add(msgData.type);
+                bubble.innerText = msgData.text;
+
+                if (msgData.type === 'received') {
+                    if (currentIndex === 0 || conversation[currentIndex-1].type === 'sent') {
+                        const label = document.createElement('div');
+                        label.classList.add('name-label');
+                        label.innerText = "Paula";
+                        chatContainer.appendChild(label);
+                    }
+                }
+
+                chatContainer.appendChild(bubble);
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+                currentIndex++;
+
+                if (currentIndex === 1) {
+                    tapInstruction.style.opacity = '0';
+                }
+            } else {
+                tapInstruction.innerText = "I love you ❤️";
+                tapInstruction.style.opacity = '1';
+            }
+        }
+
+        // Listeners
+        document.addEventListener('click', (e) => {
+            // If checking click on intro screen, let the onclick handler do it.
+            // If chat started, add message.
+            if(chatStarted) {
+                addNextMessage();
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                if (!chatStarted) {
+                    startChat();
+                } else {
+                    addNextMessage();
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
