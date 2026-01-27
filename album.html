@@ -8,7 +8,8 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a;
+            /* A vibrant, deep space base */
+            background: linear-gradient(135deg, #1a0b2e 0%, #3a1c71 50%, #006064 100%);
             color: white;
             font-family: 'Courier New', Courier, monospace;
             display: flex;
@@ -17,7 +18,52 @@
             height: 100vh;
             overflow: hidden;
             user-select: none;
+            position: relative;
         }
+
+        /* --- EPIC UNIVERSE ANIMATED BACKGROUND --- */
+        .epic-bg-layer {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Layer 1: Twinkling Stars */
+        .stars {
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
+            background-size: 200px 200px;
+            animation: twinkle 4s infinite;
+            opacity: 0.6;
+        }
+
+        /* Layer 2: Vibrant Nebula/Portal Glows */
+        .nebula-glow {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%; left: -50%;
+            /* Big washes of vibrant Epic Universe colors (cyan/magenta) */
+            background: radial-gradient(circle at 30% 30%, rgba(76, 201, 240, 0.4), transparent 40%),
+                        radial-gradient(circle at 70% 70%, rgba(247, 37, 133, 0.4), transparent 40%);
+            filter: blur(80px); /* Makes it soft and cloudy */
+            animation: rotate-glow 30s linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        @keyframes rotate-glow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
 
         /* --- THE CAMERA SCENE --- */
         #camera-scene {
@@ -33,10 +79,11 @@
         .camera-body {
             width: 200px;
             height: 140px;
-            background: #e0e0e0;
+            /* Made the camera a bit sleeker to match the modern vibe */
+            background: linear-gradient(to bottom, #ececec, #d0d0d0);
             border-radius: 20px;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -48,7 +95,7 @@
             left: 40px;
             width: 120px;
             height: 20px;
-            background: #c0c0c0;
+            background: #b0b0b0;
             border-radius: 10px 10px 0 0;
         }
 
@@ -68,7 +115,8 @@
         .lens-glass {
             width: 40px;
             height: 40px;
-            background: #1a1a2e;
+            /* The reflection inside the lens is now colorful */
+            background: linear-gradient(45deg, #3a1c71, #006064);
             border-radius: 50%;
             position: relative;
         }
@@ -79,7 +127,7 @@
             right: 8px;
             width: 10px;
             height: 10px;
-            background: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.5);
             border-radius: 50%;
         }
 
@@ -91,11 +139,14 @@
             height: 10px;
             background: #fff;
             border-radius: 4px;
+            box-shadow: 0 0 10px #fff;
         }
 
         .click-text {
             margin-top: 30px;
-            opacity: 0.7;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
             animation: pulse 1.5s infinite;
         }
 
@@ -107,26 +158,26 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            background: radial-gradient(circle at center, #2b2b2b 0%, #000 100%);
+            /* Removed the old dark background so the new vibrant one shows through */
         }
 
         .polaroid {
             background: white;
             padding: 15px 15px 50px 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             transform: rotate(-2deg);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-width: 85%;
             width: 320px;
             text-align: center;
+            z-index: 5;
         }
         
-        /* The actual image tag */
         .polaroid img {
             width: 100%;
             height: auto;
             display: block;
-            background-color: #eee; /* Placeholder color */
+            background-color: #eee;
             min-height: 200px;
         }
 
@@ -145,9 +196,9 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
+            0% { opacity: 0.6; scale: 1; }
+            50% { opacity: 1; scale: 1.05; }
+            100% { opacity: 0.6; scale: 1; }
         }
         
         /* Animation for changing photos */
@@ -161,17 +212,16 @@
             100% { transform: rotate(-2deg) translateX(0); opacity: 1; }
         }
 
-        .photo-exit {
-            animation: slideOut 0.6s forwards;
-        }
-        
-        .photo-enter {
-            animation: slideIn 0.6s forwards;
-        }
+        .photo-exit { animation: slideOut 0.6s forwards; }
+        .photo-enter { animation: slideIn 0.6s forwards; }
 
     </style>
 </head>
 <body>
+
+    <div class="epic-bg-layer nebula-glow"></div>
+    <div class="epic-bg-layer stars"></div>
+
 
     <div id="camera-scene" onclick="enterCamera()">
         <div class="camera-body">
@@ -183,15 +233,15 @@
             </div>
             <div class="flash"></div>
         </div>
-        <div class="click-text">Tap to snap a memory</div>
+        <div class="click-text">Enter the Universe ✨</div>
     </div>
 
     <div id="album-scene" onclick="nextPhoto()">
         <div class="polaroid" id="photo-frame">
             <img id="current-photo" src="" alt="Memory">
-            <div class="caption" id="caption-text">Epic Universe 🌌</div>
+            <div class="caption" id="caption-text">Epic Memories 🚀</div>
         </div>
-        <div style="margin-top:30px; font-size: 0.8rem; color: #666;">
+        <div style="margin-top:30px; font-size: 0.9rem; color: rgba(255,255,255,0.8); text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
             (Tap photo for next)
         </div>
     </div>
@@ -199,7 +249,7 @@
     <script>
         // CONFIGURATION:
         // Update this number to match how many photos you have!
-        const totalPhotos = 6; 
+        const totalPhotos = 5; 
         
         let currentPhotoIndex = 1;
         const cameraScene = document.getElementById('camera-scene');
@@ -215,16 +265,13 @@
             setTimeout(() => {
                 cameraScene.style.display = 'none';
                 albumScene.style.display = 'flex';
-                
                 // Load first photo
                 loadPhoto(1);
             }, 800);
         }
 
         function loadPhoto(index) {
-            // Set the source to just the number.jpg
             photoImg.src = index + ".jpg";
-            
             // Add a little random rotation for realism
             const randomRot = Math.random() * 6 - 3; // between -3 and 3
             photoFrame.style.transform = `rotate(${randomRot}deg)`;
