@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epic Universe Memories</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- THE CAMERA SCENE --- */
+        #camera-scene {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 1s ease-in, opacity 0.5s ease-in;
+            z-index: 10;
+        }
+
+        .camera-body {
+            width: 200px;
+            height: 140px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .camera-top {
+            position: absolute;
+            top: -20px;
+            left: 40px;
+            width: 120px;
+            height: 20px;
+            background: #c0c0c0;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .lens {
+            width: 90px;
+            height: 90px;
+            background: #333;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 20px black;
+        }
+
+        .lens-glass {
+            width: 40px;
+            height: 40px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .lens-reflection {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+        }
+
+        .flash {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            width: 20px;
+            height: 10px;
+            background: #fff;
+            border-radius: 4px;
+        }
+
+        .click-text {
+            margin-top: 30px;
+            opacity: 0.7;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* --- THE PHOTO ALBUM SCENE --- */
+        #album-scene {
+            display: none; /* Hidden at start */
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: radial-gradient(circle at center, #2b2b2b 0%, #000 100%);
+        }
+
+        .polaroid {
+            background: white;
+            padding: 15px 15px 50px 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transform: rotate(-2deg);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 85%;
+            width: 320px;
+            text-align: center;
+        }
+        
+        /* The actual image tag */
+        .polaroid img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background-color: #eee; /* Placeholder color */
+            min-height: 200px;
+        }
+
+        .caption {
+            color: #333;
+            font-family: 'Brush Script MT', cursive;
+            font-size: 1.5rem;
+            margin-top: 15px;
+        }
+
+        /* Animation for clicking the camera */
+        .zoom-in {
+            transform: scale(15);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        /* Animation for changing photos */
+        @keyframes slideOut {
+            0% { transform: rotate(-2deg) translateX(0); opacity: 1; }
+            100% { transform: rotate(20deg) translateX(100vw); opacity: 0; }
+        }
+        
+        @keyframes slideIn {
+            0% { transform: rotate(-10deg) translateX(-100vw); opacity: 0; }
+            100% { transform: rotate(-2deg) translateX(0); opacity: 1; }
+        }
+
+        .photo-exit {
+            animation: slideOut 0.6s forwards;
+        }
+        
+        .photo-enter {
+            animation: slideIn 0.6s forwards;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="camera-scene" onclick="enterCamera()">
+        <div class="camera-body">
+            <div class="camera-top"></div>
+            <div class="lens">
+                <div class="lens-glass">
+                    <div class="lens-reflection"></div>
+                </div>
+            </div>
+            <div class="flash"></div>
+        </div>
+        <div class="click-text">Tap to snap a memory</div>
+    </div>
+
+    <div id="album-scene" onclick="nextPhoto()">
+        <div class="polaroid" id="photo-frame">
+            <img id="current-photo" src="" alt="Memory">
+            <div class="caption" id="caption-text">Epic Universe 🌌</div>
+        </div>
+        <div style="margin-top:30px; font-size: 0.8rem; color: #666;">
+            (Tap photo for next)
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION:
+        // Update this number to match how many photos you have!
+        const totalPhotos = 5; 
+        
+        let currentPhotoIndex = 1;
+        const cameraScene = document.getElementById('camera-scene');
+        const albumScene = document.getElementById('album-scene');
+        const photoFrame = document.getElementById('photo-frame');
+        const photoImg = document.getElementById('current-photo');
+
+        function enterCamera() {
+            // 1. Play Zoom Animation
+            cameraScene.classList.add('zoom-in');
+            
+            // 2. Wait 0.8s, then switch scenes
+            setTimeout(() => {
+                cameraScene.style.display = 'none';
+                albumScene.style.display = 'flex';
+                
+                // Load first photo
+                loadPhoto(1);
+            }, 800);
+        }
+
+        function loadPhoto(index) {
+            // Set the source to just the number.jpg
+            photoImg.src = index + ".jpg";
+            
+            // Add a little random rotation for realism
+            const randomRot = Math.random() * 6 - 3; // between -3 and 3
+            photoFrame.style.transform = `rotate(${randomRot}deg)`;
+        }
+
+        function nextPhoto() {
+            // Add exit animation
+            photoFrame.classList.add('photo-exit');
+
+            setTimeout(() => {
+                // Increment index
+                currentPhotoIndex++;
+                if (currentPhotoIndex > totalPhotos) {
+                    currentPhotoIndex = 1; // Loop back to start
+                }
+
+                // Remove exit class, add enter class
+                photoFrame.classList.remove('photo-exit');
+                photoFrame.classList.add('photo-enter');
+
+                // Change actual image
+                loadPhoto(currentPhotoIndex);
+
+                // Clean up animation class after it finishes
+                setTimeout(() => {
+                    photoFrame.classList.remove('photo-enter');
+                }, 600);
+
+            }, 500); // Wait for exit animation to finish
+        }
+    </script>
+</body>
+</html>
