@@ -45,32 +45,44 @@
             margin-bottom: 30px;
         }
 
+        /* --- BUTTON CONTAINER --- */
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px; /* Keeps them separated but centered together */
+            min-height: 80px; /* Reserve space so things don't jump */
+            position: relative;
+        }
+
         button {
             font-size: 1.2em;
             padding: 10px 30px;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            margin: 10px;
-            transition: transform 0.2s;
+            transition: transform 0.1s; /* Faster transition for the click effect */
             font-weight: bold;
+            white-space: nowrap; /* Prevents text breaking when growing */
         }
 
         #yesBtn {
             background-color: #ff4d4d;
             color: white;
             box-shadow: 0 4px 10px rgba(255, 77, 77, 0.4);
+            z-index: 2; /* Ensure it stays clickable if it gets huge */
         }
         
-        #yesBtn:hover {
-            transform: scale(1.1);
-            background-color: #ff1a1a;
+        /* Removed hover scale here so JS handles the scaling exclusively */
+        #yesBtn:active {
+            transform: scale(0.95);
         }
 
         #noBtn {
             background-color: #e0e0e0;
             color: #333;
-            position: absolute; 
+            /* No absolute positioning initially, so it centers with Yes */
+            position: relative; 
         }
 
         /* --- BACKGROUND OBJECTS --- */
@@ -157,7 +169,7 @@
         
         /* --- WARNING OVERLAY --- */
         .warning-overlay {
-            display: none; /* Hidden by default */
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
@@ -228,8 +240,8 @@
                 and I couldn’t have asked for anyone else to ask to be my Valentine.
             </p>
             
-            <div style="position: relative; height: 60px;">
-                <button id="yesBtn" onclick="sayYes()">YES</button>
+            <div class="buttons-container">
+                <button id="yesBtn" onclick="clickYes()">YES</button>
                 <button id="noBtn" onmouseover="moveButton()" onclick="triggerWarning()">NO</button>
             </div>
         </div>
@@ -266,6 +278,7 @@
             var x = Math.random() * (window.innerWidth - 100);
             var y = Math.random() * (window.innerHeight - 50);
             
+            // Switch to fixed to escape the container
             btn.style.position = 'fixed'; 
             btn.style.left = x + 'px';
             btn.style.top = y + 'px';
@@ -274,20 +287,35 @@
         // 3. Warning Logic
         function triggerWarning() {
             var warning = document.getElementById('warningScreen');
-            warning.style.display = 'flex'; // Show the red screen
-            
-            // Hide it after 2 seconds
+            warning.style.display = 'flex';
             setTimeout(function() {
                 warning.style.display = 'none';
-                moveButton(); // Move the button so she can't click it again immediately
+                moveButton(); 
             }, 2000);
         }
 
-        // 4. Success Logic
-        function sayYes() {
-            document.getElementById('page1').classList.add('hidden');
-            document.getElementById('page2').classList.remove('hidden');
-            document.getElementById('planes').style.display = 'block';
+        // 4. Yes Button Logic (10 Clicks)
+        let yesClicks = 0;
+        const requiredClicks = 10;
+
+        function clickYes() {
+            yesClicks++;
+            var btn = document.getElementById('yesBtn');
+            
+            // Make button grow
+            // Scale formula: 1 + (clicks * 0.15) -> grows 15% each time
+            var newScale = 1 + (yesClicks * 0.15);
+            btn.style.transform = "scale(" + newScale + ")";
+            
+            // Optional: You can uncomment this if you want the text to count down
+            // btn.innerText = "YES (" + (requiredClicks - yesClicks) + ")";
+
+            if (yesClicks >= requiredClicks) {
+                // Trigger Success
+                document.getElementById('page1').classList.add('hidden');
+                document.getElementById('page2').classList.remove('hidden');
+                document.getElementById('planes').style.display = 'block';
+            }
         }
     </script>
 </body>
