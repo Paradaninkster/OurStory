@@ -45,13 +45,13 @@
             margin-bottom: 30px;
         }
 
-        /* --- BUTTON CONTAINER --- */
+        /* --- BUTTONS --- */
         .buttons-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px; /* Keeps them separated but centered together */
-            min-height: 80px; /* Reserve space so things don't jump */
+            gap: 20px;
+            min-height: 80px;
             position: relative;
         }
 
@@ -61,19 +61,18 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.1s; /* Faster transition for the click effect */
+            transition: transform 0.1s;
             font-weight: bold;
-            white-space: nowrap; /* Prevents text breaking when growing */
+            white-space: nowrap;
         }
 
         #yesBtn {
             background-color: #ff4d4d;
             color: white;
             box-shadow: 0 4px 10px rgba(255, 77, 77, 0.4);
-            z-index: 2; /* Ensure it stays clickable if it gets huge */
+            z-index: 2;
         }
         
-        /* Removed hover scale here so JS handles the scaling exclusively */
         #yesBtn:active {
             transform: scale(0.95);
         }
@@ -81,8 +80,27 @@
         #noBtn {
             background-color: #e0e0e0;
             color: #333;
-            /* No absolute positioning initially, so it centers with Yes */
             position: relative; 
+        }
+
+        /* --- EXPLOSION HEARTS --- */
+        .heart-particle {
+            position: fixed;
+            font-size: 1.5rem;
+            pointer-events: none;
+            z-index: 9999; /* On top of everything */
+            animation: explode 0.8s forwards ease-out;
+        }
+
+        @keyframes explode {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translate(var(--tx), var(--ty)) scale(0.5); 
+                opacity: 0; 
+            }
         }
 
         /* --- BACKGROUND OBJECTS --- */
@@ -278,7 +296,6 @@
             var x = Math.random() * (window.innerWidth - 100);
             var y = Math.random() * (window.innerHeight - 50);
             
-            // Switch to fixed to escape the container
             btn.style.position = 'fixed'; 
             btn.style.left = x + 'px';
             btn.style.top = y + 'px';
@@ -302,19 +319,62 @@
             yesClicks++;
             var btn = document.getElementById('yesBtn');
             
-            // Make button grow
-            // Scale formula: 1 + (clicks * 0.15) -> grows 15% each time
-            var newScale = 1 + (yesClicks * 0.15);
-            btn.style.transform = "scale(" + newScale + ")";
-            
-            // Optional: You can uncomment this if you want the text to count down
-            // btn.innerText = "YES (" + (requiredClicks - yesClicks) + ")";
+            if (yesClicks < requiredClicks) {
+                // Grow button
+                var newScale = 1 + (yesClicks * 0.15);
+                btn.style.transform = "scale(" + newScale + ")";
+            } else {
+                // EXPLOSION TIME!
+                
+                // 1. Hide the button text/color immediately to make it look like it popped
+                btn.style.visibility = 'hidden'; 
+                
+                // 2. Create Hearts
+                createExplosion(btn);
 
-            if (yesClicks >= requiredClicks) {
-                // Trigger Success
-                document.getElementById('page1').classList.add('hidden');
-                document.getElementById('page2').classList.remove('hidden');
-                document.getElementById('planes').style.display = 'block';
+                // 3. Wait 500ms for explosion to expand, then show Success Page
+                setTimeout(() => {
+                    document.getElementById('page1').classList.add('hidden');
+                    document.getElementById('page2').classList.remove('hidden');
+                    document.getElementById('planes').style.display = 'block';
+                }, 500);
+            }
+        }
+
+        function createExplosion(element) {
+            const rect = element.getBoundingClientRect();
+            // Calculate center of the button
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Create 50 hearts
+            for (let i = 0; i < 50; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart-particle');
+                heart.innerText = '💗';
+                
+                // Set initial position to center of button
+                heart.style.left = centerX + 'px';
+                heart.style.top = centerY + 'px';
+
+                // Random angle and distance
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 100 + Math.random() * 200; // Explode out 100-300px
+                
+                // Calculate final position vars for CSS
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+
+                heart.style.setProperty('--tx', `${tx}px`);
+                heart.style.setProperty('--ty', `${ty}px`);
+
+                // Add to body
+                document.body.appendChild(heart);
+
+                // Cleanup particle after animation
+                setTimeout(() => {
+                    heart.remove();
+                }, 800);
             }
         }
     </script>
