@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Paula 💗</title>
+    <style>
+        body {
+            background-color: #ffe6e6;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- THE BOX --- */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            border: 4px solid #ff4d4d;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #ff4d4d;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        #yesBtn {
+            background-color: #ff4d4d;
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 77, 77, 0.4);
+        }
+        
+        #yesBtn:hover {
+            transform: scale(1.1);
+            background-color: #ff1a1a;
+        }
+
+        #noBtn {
+            background-color: #e0e0e0;
+            color: #333;
+            position: absolute; 
+        }
+
+        /* --- BACKGROUND OBJECTS --- */
+        .background-objects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; 
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floater {
+            position: absolute;
+            top: 110vh; 
+            font-size: 3em;
+            opacity: 0.6;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-120vh) rotate(360deg); }
+        }
+
+        /* --- PLANES --- */
+        .planes-container {
+            display: none; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .plane-wrapper {
+            position: absolute;
+            white-space: nowrap;
+        }
+
+        .banner-text {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 15px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #333;
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 1.2em;
+        }
+
+        .plane-icon {
+            font-size: 3.5em;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 10px;
+        }
+
+        .plane-top {
+            top: 10%;
+            animation: fly-left 15s linear infinite;
+        }
+        .plane-top .plane-icon { transform: scaleX(-1); }
+
+        .plane-bottom {
+            bottom: 15%;
+            animation: fly-right 15s linear infinite;
+        }
+
+        @keyframes fly-left {
+            0% { left: 110%; transform: translateX(0); }
+            100% { left: -150%; transform: translateX(0); }
+        }
+
+        @keyframes fly-right {
+            0% { left: -150%; transform: translateX(0); }
+            100% { left: 110%; transform: translateX(0); }
+        }
+        
+        /* --- WARNING OVERLAY --- */
+        .warning-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ff0000;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .warning-text {
+            font-size: 4em;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="warningScreen" class="warning-overlay">
+        <div class="warning-text">WRONG ANSWER!<br>TRY AGAIN!!</div>
+    </div>
+
+    <div id="planes" class="planes-container">
+        <div class="plane-wrapper plane-top">
+            <span class="plane-icon">✈️</span>
+            <span class="banner-text">Aarav and Paula sitting in a tree K I S S I N G</span>
+        </div>
+        <div class="plane-wrapper plane-bottom">
+            <span class="banner-text">SHE SAID YES!!! 💗💗💗</span>
+            <span class="plane-icon">✈️</span>
+        </div>
+    </div>
+
+    <div class="background-objects" id="bgObjects"></div>
+
+    <div class="container">
+        <div style="font-size: 2.5em; margin-bottom: 10px;">🌷 🌷 🌷</div>
+
+        <div id="page1">
+            <h1>Will you be my Valentine?</h1>
+            <p>
+                Hi babyyy!!! I’m so exciteddd! This is our first Valentine's Day together, 
+                and I couldn’t have asked for anyone else to ask to be my Valentine.
+            </p>
+            
+            <div style="position: relative; height: 60px;">
+                <button id="yesBtn" onclick="sayYes()">YES</button>
+                <button id="noBtn" onmouseover="moveButton()" onclick="triggerWarning()">NO</button>
+            </div>
+        </div>
+
+        <div id="page2" class="hidden">
+            <div style="font-size: 5em; margin-bottom: 20px;">
+                <span style="display:inline-block; transform: scaleX(-1);">🦛</span> 
+                💗 
+                <span style="display:inline-block;">🦛</span>
+            </div>
+            <h1>Yayy!!</h1>
+            <p>You're so special to me. I love you 💗</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Generate Floating Background Objects
+        const bgContainer = document.getElementById('bgObjects');
+        const icons = ['🌷', '🦛', '🌷', '🌷', '🦛'];
+
+        for (let i = 0; i < 20; i++) {
+            let el = document.createElement('div');
+            el.classList.add('floater');
+            el.innerText = icons[Math.floor(Math.random() * icons.length)];
+            el.style.left = Math.random() * 95 + 'vw';
+            el.style.animationDuration = (Math.random() * 7 + 5) + 's';
+            el.style.animationDelay = (Math.random() * 10) + 's';
+            bgContainer.appendChild(el);
+        }
+
+        // 2. Runaway Button Logic
+        function moveButton() {
+            var btn = document.getElementById('noBtn');
+            var x = Math.random() * (window.innerWidth - 100);
+            var y = Math.random() * (window.innerHeight - 50);
+            
+            btn.style.position = 'fixed'; 
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        // 3. Warning Logic
+        function triggerWarning() {
+            var warning = document.getElementById('warningScreen');
+            warning.style.display = 'flex'; // Show the red screen
+            
+            // Hide it after 2 seconds
+            setTimeout(function() {
+                warning.style.display = 'none';
+                moveButton(); // Move the button so she can't click it again immediately
+            }, 2000);
+        }
+
+        // 4. Success Logic
+        function sayYes() {
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.remove('hidden');
+            document.getElementById('planes').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
