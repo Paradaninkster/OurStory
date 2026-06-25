@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>52 reasons</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #fff5f8 0%, #ffe9ee 45%, #ffd9e3 100%);
+    touch-action: manipulation;
+    user-select: none;
+  }
+
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    perspective: 1400px;
+  }
+
+  #title-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    text-align: center;
+    padding: 20px 16px 6px;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  #title-bar h1 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+    color: #c43d63;
+    letter-spacing: 0.2px;
+  }
+
+  #title-bar p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #b46680;
+    font-weight: 600;
+  }
+
+  #counter {
+    position: absolute;
+    top: 14px; right: 16px;
+    background: #fff;
+    border: 2px solid #ffc9d8;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #c43d63;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(196, 61, 99, 0.15);
+  }
+
+  #pile-zone {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+
+  .pile-label {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 800;
+    color: #c47a93;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: center;
+    width: 150px;
+    pointer-events: none;
+  }
+
+  #draw-label { left: 28%; }
+  #discard-label { left: 72%; }
+
+  .empty-slot {
+    position: absolute;
+    width: 150px;
+    height: 210px;
+    left: 50%; top: 50%;
+    border: 2.5px dashed #ffc2d3;
+    border-radius: 14px;
+    pointer-events: none;
+  }
+
+  .card {
+    position: absolute;
+    width: 150px;
+    height: 210px;
+    left: 50%; top: 50%;
+    border-radius: 14px;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1), left 0.6s cubic-bezier(0.22, 0.61, 0.36, 1), top 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: transform;
+  }
+
+  .card.no-anim {
+    transition: none;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  }
+
+  .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .face {
+    position: absolute;
+    width: 100%; height: 100%;
+    border-radius: 14px;
+    backface-visibility: hidden;
+    box-shadow: 0 6px 16px rgba(150, 40, 70, 0.28), 0 2px 4px rgba(150,40,70,0.12);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+
+  .face-back {
+    background:
+      repeating-linear-gradient(45deg, #ff8fab 0 8px, #ff7096 8px 16px);
+    background-color: #ff85a1;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .face-back-inner {
+    width: 78%;
+    height: 86%;
+    border: 2.5px solid rgba(255,255,255,0.85);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .face-back-mark {
+    font-size: 34px;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .face-front {
+    background: #fffdf9;
+    transform: rotateY(180deg);
+    padding: 14px 13px 12px;
+    justify-content: space-between;
+  }
+
+  .face-front.suit-hearts { background: #fff5f7; }
+  .face-front.suit-diamonds { background: #fff8f0; }
+  .face-front.suit-clubs { background: #f3fbf6; }
+  .face-front.suit-spades { background: #f3f6fd; }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .rank {
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .suit-icon {
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  .suit-hearts .rank, .suit-hearts .suit-icon { color: #e0436b; }
+  .suit-diamonds .rank, .suit-diamonds .suit-icon { color: #e08a2b; }
+  .suit-clubs .rank, .suit-clubs .suit-icon { color: #2f9e63; }
+  .suit-spades .rank, .suit-spades .suit-icon { color: #4a5fc1; }
+
+  .card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transform: rotate(180deg);
+  }
+
+  .reason-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12.5px;
+    line-height: 1.38;
+    font-weight: 700;
+    color: #4a3530;
+    padding: 4px 2px;
+    overflow: hidden;
+  }
+
+  #reshuffle-btn {
+    position: absolute;
+    bottom: 26px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    background: #c43d63;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 13px 30px;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 4px 14px rgba(196, 61, 99, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  #reshuffle-btn:active {
+    transform: translateX(-50%) scale(0.95);
+  }
+
+  #reshuffle-btn svg {
+    width: 18px; height: 18px;
+  }
+
+  #hint {
+    position: absolute;
+    bottom: 80px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #b46680;
+    font-weight: 700;
+    z-index: 55;
+    opacity: 0.85;
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  #done-banner {
+    position: absolute;
+    top: 64px; left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: #fff;
+    border: 2px solid #ffc9d8;
+    border-radius: 14px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #c43d63;
+    z-index: 55;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    text-align: center;
+  }
+
+  #done-banner.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+
+  @media (max-width: 420px) {
+    .card, .empty-slot { width: 124px; height: 174px; }
+    .pile-label { width: 124px; }
+    .reason-text { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="title-bar">
+    <h1>52 reasons I love you</h1>
+    <p>happy one year, paula</p>
+  </div>
+  <div id="counter">0 / 52 read</div>
+  <div id="done-banner">that's all 52 &middot; tap reshuffle to go again</div>
+  <div id="pile-zone">
+    <div class="empty-slot" id="draw-slot" style="left:28%;"></div>
+    <div class="empty-slot" id="discard-slot" style="left:72%;"></div>
+    <div class="pile-label" id="draw-label">draw pile</div>
+    <div class="pile-label" id="discard-label">read pile</div>
+  </div>
+  <div id="hint">tap the top card to flip and read it</div>
+  <button id="reshuffle-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+    reshuffle
+  </button>
+</div>
+
+<script>
+const REASONS = [
+  {suit:"hearts", text:"The way you hum without realizing it when you're cooking"},
+  {suit:"hearts", text:"You remember how everyone in your life takes their coffee"},
+  {suit:"hearts", text:"You hold my hand even when we're just walking to the kitchen"},
+  {suit:"hearts", text:"The way you say my name when you're trying not to laugh"},
+  {suit:"hearts", text:"You leave little notes places just so I find them"},
+  {suit:"hearts", text:"How you fall asleep mid-sentence and insist you weren't"},
+  {suit:"hearts", text:"You always know when I've had a bad day before I say it"},
+  {suit:"hearts", text:"The way you steal the blanket and somehow still cuddle closer"},
+  {suit:"hearts", text:"You make even grocery runs feel like an adventure"},
+  {suit:"hearts", text:"How soft your voice gets right before we fall asleep"},
+  {suit:"hearts", text:"You save me the last bite without me ever asking"},
+  {suit:"hearts", text:"The way you say 'we' about everything, even my problems"},
+  {suit:"hearts", text:"You make our apartment feel like home, not just a place"},
+
+  {suit:"diamonds", text:"Your laugh is the most honest sound I know"},
+  {suit:"diamonds", text:"You're kinder to strangers than most people are to friends"},
+  {suit:"diamonds", text:"You never let me get away with selling myself short"},
+  {suit:"diamonds", text:"The way you light up talking about something you love"},
+  {suit:"diamonds", text:"You're stubborn in all the ways that make you strong"},
+  {suit:"diamonds", text:"You ask good questions instead of just waiting to talk"},
+  {suit:"diamonds", text:"You notice when other people are struggling before they say it"},
+  {suit:"diamonds", text:"Your patience with me is a kind of grace I don't take for granted"},
+  {suit:"diamonds", text:"You're unapologetically you, even when it's inconvenient"},
+  {suit:"diamonds", text:"The way you fight for people you love, loudly if you have to"},
+  {suit:"diamonds", text:"You make hard decisions look like they cost you less than they do"},
+  {suit:"diamonds", text:"Your taste makes everything around you a little more you"},
+  {suit:"diamonds", text:"You're the most curious person I know"},
+
+  {suit:"clubs", text:"You eat meat, I don't, and dinner negotiations are still the best part of my day"},
+  {suit:"clubs", text:"The way you talk trash during game night like your life depends on it"},
+  {suit:"clubs", text:"You've turned every road trip into a playlist I still hum"},
+  {suit:"clubs", text:"You make fun of me in a way that feels like a love language"},
+  {suit:"clubs", text:"Our inside jokes that no one else will ever understand"},
+  {suit:"clubs", text:"You commit fully to bad accents and worse dance moves"},
+  {suit:"clubs", text:"The way Rishi and Mei light up the second you walk in"},
+  {suit:"clubs", text:"You always say yes to one more game even when we're losing"},
+  {suit:"clubs", text:"How competitive you get over the smallest, dumbest things"},
+  {suit:"clubs", text:"You make ordinary Tuesdays feel like an occasion"},
+  {suit:"clubs", text:"The way you narrate movies under your breath like commentary"},
+  {suit:"clubs", text:"You've never once let me win at anything on purpose"},
+  {suit:"clubs", text:"Our terrible karaoke duets that I'd choose over a concert"},
+
+  {suit:"spades", text:"You make plans with me like the future is already certain"},
+  {suit:"spades", text:"The way you say 'when we're old' like it's a promise, not a maybe"},
+  {suit:"spades", text:"You believe in the things I'm building before they're real"},
+  {suit:"spades", text:"You make me want to be steadier, kinder, more patient"},
+  {suit:"spades", text:"The version of me you see is the one I'm trying to become"},
+  {suit:"spades", text:"You've never once made me feel like I had to earn your love"},
+  {suit:"spades", text:"We argue and somehow still end up on the same side"},
+  {suit:"spades", text:"You make the unglamorous parts of a life together feel like the good parts"},
+  {suit:"spades", text:"I trust you with the parts of me I don't show anyone else"},
+  {suit:"spades", text:"You chose me on purpose, every day, not just once"},
+  {suit:"spades", text:"The life we're building looks exactly like the one I'd pick again"},
+  {suit:"spades", text:"A year in, and you still feel like the best decision I've made"},
+  {suit:"spades", text:"I love you today more than the day I married you, and I'll say that every year"}
+];
+
+const SUIT_ICON = { hearts: "\u2665", diamonds: "\u2666", clubs: "\u2663", spades: "\u2660" };
+const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+
+function buildDeckData() {
+  const bySuit = { hearts: [], diamonds: [], clubs: [], spades: [] };
+  REASONS.forEach(r => bySuit[r.suit].push(r.text));
+  const deck = [];
+  Object.keys(bySuit).forEach(suit => {
+    bySuit[suit].forEach((text, i) => {
+      deck.push({ suit, rank: RANKS[i], text });
+    });
+  });
+  return deck;
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const deckData = buildDeckData();
+const N = deckData.length;
+const pileZone = document.getElementById('pile-zone');
+const counterEl = document.getElementById('counter');
+const doneBanner = document.getElementById('done-banner');
+
+let drawOrder = shuffleArray(deckData.map((_, i) => i));
+let discardOrder = [];
+const cardEls = [];
+
+function cardWH() {
+  return window.innerWidth <= 420 ? { w: 124, h: 174 } : { w: 150, h: 210 };
+}
+
+function makeCard(data, idx) {
+  const card = document.createElement('div');
+  card.className = 'card no-anim';
+  card.dataset.idx = idx;
+
+  const inner = document.createElement('div');
+  inner.className = 'card-inner';
+
+  const back = document.createElement('div');
+  back.className = 'face face-back';
+  const backInner = document.createElement('div');
+  backInner.className = 'face-back-inner';
+  backInner.innerHTML = '<span class="face-back-mark">&#9825;</span>';
+  back.appendChild(backInner);
+
+  const front = document.createElement('div');
+  front.className = 'face face-front suit-' + data.suit;
+
+  const topRow = document.createElement('div');
+  topRow.className = 'card-top';
+  topRow.innerHTML = '<span class="rank">' + data.rank + '</span><span class="suit-icon">' + SUIT_ICON[data.suit] + '</span>';
+
+  const reason = document.createElement('div');
+  reason.className = 'reason-text';
+  reason.textContent = data.text;
+
+  const bottomRow = document.createElement('div');
+  bottomRow.className = 'card-bottom';
+  bottomRow.innerHTML = '<span class="rank">' + data.rank + '</span><span class="suit-icon">' + SUIT_ICON[data.suit] + '</span>';
+
+  front.appendChild(topRow);
+  front.appendChild(reason);
+  front.appendChild(bottomRow);
+
+  inner.appendChild(back);
+  inner.appendChild(front);
+  card.appendChild(inner);
+
+  card.addEventListener('click', () => onCardClick(idx));
+
+  return card;
+}
+
+deckData.forEach((data, idx) => {
+  const el = makeCard(data, idx);
+  cardEls.push(el);
+  pileZone.appendChild(el);
+});
+
+function positionCard(el, pileSideLeftPct, pos, flipped) {
+  const dims = cardWH();
+  const jitterX = pos * 0.3;
+  const jitterY = pos * -0.3;
+  const rot = (pos % 7 - 3) * 0.5;
+  el.style.left = pileSideLeftPct;
+  el.style.top = '54%';
+  el.style.zIndex = pos + 1;
+  el.style.transform = 'translate(-50%, -50%) translate(' + jitterX + 'px,' + jitterY + 'px) rotate(' + rot + 'deg)';
+  if (flipped) el.classList.add('flipped');
+  else el.classList.remove('flipped');
+}
+
+function renderAll(noAnim) {
+  drawOrder.forEach((deckIdx, pos) => {
+    const el = cardEls[deckIdx];
+    if (noAnim) el.classList.add('no-anim');
+    positionCard(el, '28%', pos, false);
+  });
+  discardOrder.forEach((deckIdx, pos) => {
+    const el = cardEls[deckIdx];
+    if (noAnim) el.classList.add('no-anim');
+    positionCard(el, '72%', pos, true);
+  });
+  if (noAnim) {
+    requestAnimationFrame(() => {
+      cardEls.forEach(el => el.classList.remove('no-anim'));
+    });
+  }
+  updateCounter();
+  updateDoneBanner();
+}
+
+function updateCounter() {
+  counterEl.textContent = discardOrder.length + ' / ' + N + ' read';
+}
+
+function updateDoneBanner() {
+  if (drawOrder.length === 0 && discardOrder.length === N) {
+    doneBanner.classList.add('show');
+  } else {
+    doneBanner.classList.remove('show');
+  }
+}
+
+function onCardClick(idx) {
+  const pos = drawOrder.indexOf(idx);
+  if (pos !== drawOrder.length - 1) return;
+
+  drawOrder.pop();
+  discardOrder.push(idx);
+
+  const el = cardEls[idx];
+  el.classList.add('flipped');
+  positionCard(el, '72%', discardOrder.length - 1, true);
+
+  updateCounter();
+  setTimeout(updateDoneBanner, 350);
+}
+
+function reshuffle() {
+  const all = drawOrder.concat(discardOrder);
+  shuffleArray(all);
+  drawOrder = all;
+  discardOrder = [];
+  doneBanner.classList.remove('show');
+
+  cardEls.forEach(el => el.classList.add('flipped'));
+
+  setTimeout(() => {
+    renderAll(false);
+  }, 30);
+}
+
+document.getElementById('reshuffle-btn').addEventListener('click', reshuffle);
+
+window.addEventListener('resize', () => renderAll(true));
+
+renderAll(true);
+</script>
+</body>
+</html>
